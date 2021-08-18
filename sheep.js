@@ -30,7 +30,8 @@ function initGrid() {
 function createRandomModel() {
     const model = [];
     for (var idx = 0; idx < NUM_CELLS; idx++) {
-        const alive = Math.random() > 0.7;
+        // const alive = Math.random() > 0.7;
+        const alive = false;
         model.push(alive);
     }
 
@@ -51,11 +52,78 @@ function renderModel(model) {
     const grid = document.getElementById('grid');
     for (var idx = 0; idx < NUM_CELLS; idx++) {
         if (model[idx]) {
-            grid.children[idx].classList.add("alive");            
+            grid.children[idx].classList.add("alive");
         } else {
             grid.children[idx].classList.remove("alive");
         }
+        if (seen(model, idx)) {
+            grid.children[idx].classList.add("seen");
+        } else {
+            grid.children[idx].classList.remove("seen");
+        }
     }
+}
+
+function seen(model, idx) {
+    let colRoot = idx % NUM_COLS;
+    for (var i = colRoot; i < NUM_CELLS; i += NUM_COLS) {
+        if (model[i]) {
+            return true;
+        }
+    }
+    let rowIdx = Math.floor(idx / NUM_COLS);
+    let rowRoot = rowIdx * NUM_COLS;
+    for (i = rowRoot; i < rowRoot + NUM_COLS; i++) {
+        if (model[i]) {
+            return true;
+        }
+    }
+
+    for (var rowNum = 0; rowNum < NUM_ROWS; rowNum++) {
+        let rowStart = rowNum * NUM_COLS;
+
+        let rowOffset = rowNum - rowIdx;
+        let leftDiagColNum = colRoot + rowOffset;
+        if (leftDiagColNum >= 0 && leftDiagColNum < NUM_COLS) {
+            if (model[rowStart + leftDiagColNum]) {
+                return true;
+            }
+        }
+        let rightDiagColNum = colRoot - rowOffset;
+        if (rightDiagColNum >= 0 && rightDiagColNum < NUM_COLS) {
+            if (model[rowStart + rightDiagColNum]) {
+                return true;
+            }
+        }
+        // let offsetLeft = rowNum - rowIdx;
+        // if (offsetLeft <= colRoot) {
+        //     let cellId = (rowNum * NUM_COLS) + (colRoot - offsetLeft);
+        //     if (model[cellId]) {
+        //         return true;
+        //     }
+        // }
+        // let offsetRight = rowNum + rowIdx;
+        // if (offsetRight + colRoot < NUM_COLS) {
+        //     let cellId = (rowNum * NUM_COLS) + (colRoot + offsetRight);
+        //     if (model[cellId]) {
+        //         return true;
+        //     }
+        // }
+    }
+
+    // let tlToBrRoot = idx % (NUM_COLS + 1);
+    // for (i = tlToBrRoot; i < NUM_CELLS; i += (NUM_COLS + 1)) {
+    //     if (model[i]) {
+    //         return true;
+    //     }
+    // }
+    // let trToBlRoot = idx % (NUM_COLS - 1);
+    // for (i = trToBlRoot; i < NUM_CELLS; i += (NUM_COLS - 1)) {
+    //     if (model[i]) {
+    //         return true;
+    //     }
+    // }
+    return false;
 }
 
 function iterateModel(model) {
@@ -118,45 +186,46 @@ function innerDimensions(node) {
 (function() {
     var timer = null;
     
-    let b = document.getElementById("startStopButton");
-    let rb = document.getElementById("randomizeButton");
-    let sp = document.getElementById("speedSlider");
-    let sd = document.getElementById("speedDisplay");
+    // let b = document.getElementById("startStopButton");
+    // let rb = document.getElementById("randomizeButton");
+    // let sp = document.getElementById("speedSlider");
+    // let sd = document.getElementById("speedDisplay");
     let grid = document.getElementById("grid");
 
-    let speed = sp.value;
+    // let speed = sp.value;
+    let speed = 500;
 
     var selecting = false;
     var setting = false;
 
-    b.addEventListener("click", function(event) {
-        if (timer == null) {
-            let speed = sp.value;
-            timer = window.setInterval(doGeneration, speed);
-            b.innerText = "Stop";
-            grid.classList.remove("stopped");
-        } else {
-            window.clearInterval(timer);
-            timer = null;
-            b.innerText = "Start";
-            grid.classList.add("stopped");
-        }
-    });
+    // b.addEventListener("click", function(event) {
+    //     if (timer == null) {
+    //         let speed = sp.value;
+    //         timer = window.setInterval(doGeneration, speed);
+    //         b.innerText = "Stop";
+    //         grid.classList.remove("stopped");
+    //     } else {
+    //         window.clearInterval(timer);
+    //         timer = null;
+    //         b.innerText = "Start";
+    //         grid.classList.add("stopped");
+    //     }
+    // });
 
-    rb.addEventListener("click", function(event) {
-        randomizeModel(model);
-        renderModel(model);
-    });
+    // rb.addEventListener("click", function(event) {
+    //     randomizeModel(model);
+    //     renderModel(model);
+    // });
 
-    sd.value = sp.value + " ms";
-    sp.addEventListener("input", function(event) {
-        let speed = sp.value;
-        sd.value = speed + " ms";
-        if (timer) {
-            window.clearInterval(timer);
-            timer = window.setInterval(doGeneration, speed);
-        }
-    });
+    // sd.value = sp.value + " ms";
+    // sp.addEventListener("input", function(event) {
+    //     let speed = sp.value;
+    //     sd.value = speed + " ms";
+    //     if (timer) {
+    //         window.clearInterval(timer);
+    //         timer = window.setInterval(doGeneration, speed);
+    //     }
+    // });
 
     initGrid();
     var model = createRandomModel();
@@ -165,47 +234,51 @@ function innerDimensions(node) {
     let cells = document.getElementsByClassName("cell");
     for (let i=0, cell; (cell = cells[i]) !== undefined; i++) {
         // cell.setAttribute("data-index", i);
-        cell.addEventListener('mousedown', function(event) {
+        cell.addEventListener('click', function(event) {
             model[i] = !model[i];
             renderModel(model);
         });
-        cell.addEventListener("mouseover", function() {
-            if (selecting) {
-                model[i] = setting;
-                renderModel(model);
-            }
-        });
+        // cell.addEventListener('mousedown', function(event) {
+        //     model[i] = !model[i];
+        //     renderModel(model);
+        // });
+        // cell.addEventListener("mouseover", function() {
+        //     if (selecting) {
+        //         model[i] = setting;
+        //         renderModel(model);
+        //     }
+        // });
     }
 
-    grid.addEventListener('mousedown', function(event) {
-        console.log('mousedown');
-        selecting = true;
-        setting = event.button === 0; // Set on left mouse click
-        // if (event.target.hasAttribute("data-index")) {
-        //     console.log("Has data-index: " + event.target.getAttribute("data-index"));
-        //     setting = model[event.target.getAttribute("data-index")];
-        // } else {
-        //     setting = true;
-        // }
-        event.preventDefault();
-    });
+    // grid.addEventListener('mousedown', function(event) {
+    //     console.log('mousedown');
+    //     selecting = true;
+    //     setting = event.button === 0; // Set on left mouse click
+    //     // if (event.target.hasAttribute("data-index")) {
+    //     //     console.log("Has data-index: " + event.target.getAttribute("data-index"));
+    //     //     setting = model[event.target.getAttribute("data-index")];
+    //     // } else {
+    //     //     setting = true;
+    //     // }
+    //     event.preventDefault();
+    // });
 
-    grid.addEventListener('mouseup', function(event) {
-        selecting = false;
-    });
+    // grid.addEventListener('mouseup', function(event) {
+    //     selecting = false;
+    // });
 
-    grid.addEventListener('contextmenu', function(event) {
-        event.preventDefault();
-    });
+    // grid.addEventListener('contextmenu', function(event) {
+    //     event.preventDefault();
+    // });
 
-    grid.addEventListener('dragstart', function(event) {
-        event.preventDefault();
-    });
+    // grid.addEventListener('dragstart', function(event) {
+    //     event.preventDefault();
+    // });
 
-    function doGeneration() {
-        model = iterateModel(model);
-        renderModel(model);
-    }
+    // function doGeneration() {
+    //     model = iterateModel(model);
+    //     renderModel(model);
+    // }
     
-    timer = window.setInterval(doGeneration, speed);
+    // timer = window.setInterval(doGeneration, speed);
 })();

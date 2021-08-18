@@ -45,6 +45,10 @@
     background-color: orange;
 }
 
+.seen:not(.alive) {
+    background-color: #AAA;
+}
+
 body {
     padding: 0;
     margin: 0;
