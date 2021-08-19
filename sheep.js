@@ -7,8 +7,6 @@ const NUM_CELLS = NUM_ROWS * NUM_COLS;
 
 function initGrid() {
     grid.innerHTML = '';
-    grid.style.setProperty("grid-template-columns",
-        "repeat(" + NUM_COLS + ", " + CELL_SIZE + "px)");
     for (var idx = 0; idx < NUM_CELLS; idx++) {
         const cell = document.createElement("div");
         cell.classList.add("cell");
